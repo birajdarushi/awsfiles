@@ -12,7 +12,6 @@
   const sections = qa('.pv-section');
   const emptyState = q('#emptyState');
   const toggleModeBtn = q('#toggleMode');
-  const modeLabel = q('#modeLabel');
   const toggleCompactBtn = q('#toggleCompact');
   const scrollTopBtn = q('#scrollTop');
 
@@ -101,7 +100,6 @@
           sectionVisible = true;
           // highlight paragraphs + headings
           qa('p, li, h3, h4', block).forEach(el => highlightMatches(el, searchTerm));
-          block.classList.remove('filter-dim');
         } else {
           block.style.display = 'none';
         }
@@ -114,21 +112,10 @@
 
   // Theme toggle
   const savedMode = localStorage.getItem('pv-theme');
-  if (savedMode === 'light') {
-    document.body.classList.add('light-mode');
-    toggleModeBtn?.setAttribute('aria-pressed','true');
-    if(modeLabel) modeLabel.textContent = 'Dark Mode';
-  } else {
-    if(modeLabel) modeLabel.textContent = 'Light Mode';
-  }
+  if (savedMode === 'light') document.body.classList.add('light-mode');
   toggleModeBtn?.addEventListener('click', () => {
     document.body.classList.toggle('light-mode');
-    const isLight = document.body.classList.contains('light-mode');
-    localStorage.setItem('pv-theme', isLight ? 'light' : 'dark');
-    toggleModeBtn.setAttribute('aria-pressed', isLight ? 'true' : 'false');
-    if(modeLabel) modeLabel.textContent = isLight ? 'Dark Mode' : 'Light Mode';
-    // Reapply highlights (DOM text may have been restored)
-    if(searchTerm) applyFilters();
+    localStorage.setItem('pv-theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
   });
 
   // Compact toggle (reduce spacing)
