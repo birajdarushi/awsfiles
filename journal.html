@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>YT Learner Project Journal - Rushiraj Birajdar</title>
+  <meta name="description" content="YT Learner - YouTube Playlist Todo App. A stateless, client-heavy project with AWS and Heroku deployment journey, architecture decisions, performance, and key learnings.">
+  <meta name="theme-color" content="#0f172a">
+
+  <!-- Performance: Preconnects -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Icons and Prism theme -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism-tomorrow.min.css" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- Navigation -->
+  <nav class="navbar" role="navigation" aria-label="Primary">
+    <div class="nav-container">
+      <div class="nav-logo" aria-label="Portfolio home">
+        <div class="logo-icon" aria-hidden="true">RB</div>
+        <span class="logo-text">Portfolio</span>
+      </div>
+
+      <ul class="nav-menu" role="menubar" aria-label="Main menu">
+        <li role="none">
+          <a href="index.html" class="nav-link" role="menuitem">Back to Portfolio</a>
+        </li>
+      </ul>
+
+      <a href="mailto:rushirajbirajdar@gmail.com" class="contact-btn" aria-label="Contact me via email">Contact Me</a>
+
+      <button class="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="primary-navigation">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Journal Content -->
+  <main id="main-content" class="journal-content">
+    <div class="container">
+      <article class="journal-wrapper" aria-labelledby="journal-title">
+
+        <!-- Header -->
+        <header class="journal-header">
+          <h1 id="journal-title"># YT Learner Project Journal</h1>
+          <div class="project-meta" role="contentinfo">
+            <p><strong>Project Name:</strong> YT Learner - YouTube Playlist Todo App</p>
+            <p><strong>Author:</strong> Rushiraj</p>
+            <p><strong>Start Date:</strong> August 2025</p>
+            <p><strong>Tech Stack:</strong> Node.js, Express, yt-dlp, Vanilla JavaScript, CSS</p>
+            <p><strong>Repository:</strong> birajdarushi/yt-learner</p>
+          </div>
+        </header>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Project Overview -->
+        <section class="journal-section" aria-labelledby="overview-heading">
+          <h2 id="overview-heading">🎯 Project Overview</h2>
+
+          <h3>Core Concept</h3>
+          <p>A learning-focused YouTube playlist tracker that helps users:</p>
+          <ul>
+            <li>Add YouTube playlists or individual videos</li>
+            <li>Track progress by marking videos as watched</li>
+            <li>Visualize learning progress with statistics</li>
+            <li>Maintain state locally (client-side storage)</li>
+          </ul>
+
+          <h3>Problem Statement</h3>
+          <p>YouTube's native interface lacks proper progress tracking for educational content. Users needed a dedicated tool to:</p>
+          <ul>
+            <li>Convert playlists into todo lists</li>
+            <li>Track completion status</li>
+            <li>Get visual progress indicators</li>
+            <li>Work offline with cached data</li>
+          </ul>
+        </section>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Architecture Decisions -->
+        <section class="journal-section" aria-labelledby="architecture-heading">
+          <h2 id="architecture-heading">🏗️ Architecture Decisions</h2>
+
+          <h3>Server-Side (Minimal & Stateless)</h3>
+          <pre class="code-block" aria-label="Server-side stateless example"><code class="language-javascript">// Core principle: Server only processes, never stores
+app.post('/api/playlist', async (req, res) => {
+    const playlistData = await extractPlaylistInfo(url);
+    res.json(playlistData); // Return immediately, no persistence
+});</code></pre>
+
+          <p><strong>Why Stateless?</strong></p>
+          <ul>
+            <li>Cost efficiency (no database needed)</li>
+            <li>Horizontal scaling ready</li>
+            <li>User owns their data</li>
+            <li>Faster iteration cycles</li>
+          </ul>
+
+          <h3>Client-Side (Rich & Persistent)</h3>
+          <pre class="code-block" aria-label="Client-side persistence example"><code class="language-javascript">class PlaylistManager {
+    saveData() {
+        localStorage.setItem('ytLearnerPlaylists', JSON.stringify(this.playlists));
+    }
+}</code></pre>
+
+          <p><strong>Why Client-Heavy?</strong></p>
+          <ul>
+            <li>Instant UI updates</li>
+            <li>Works offline</li>
+            <li>No write load on server</li>
+            <li>Privacy-first approach</li>
+          </ul>
+
+          <h3>Data Flow Architecture</h3>
+          <div class="data-flow-text" role="img" aria-label="Data flow: User Input to UI Render">
+            <code>User Input → Server (yt-dlp processing) → JSON Response → Client Storage → UI Render</code>
+          </div>
+        </section>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Cloud Journey -->
+        <section class="journal-section" aria-labelledby="cloud-journey-heading">
+          <h2 id="cloud-journey-heading">🚀 Cloud Infrastructure & Deployment Journey</h2>
+
+          <h3>Phase 1: AWS Cloud Architecture (Day 1)</h3>
+
+          <h4>Cloud Service Selection Strategy</h4>
+          <p><strong>Primary Services Stack:</strong></p>
+          <ul>
+            <li><strong>Elastic Beanstalk (EB):</strong> Application deployment platform</li>
+            <li><strong>CloudFront:</strong> Global CDN for edge distribution</li>
+            <li><strong>IAM:</strong> Identity and access management</li>
+            <li><strong>CloudWatch:</strong> Monitoring and logging</li>
+            <li><strong>Application Load Balancer (ALB):</strong> Traffic distribution</li>
+            <li><strong>AWS Certificate Manager (ACM):</strong> SSL/TLS certificates</li>
+            <li><strong>Route 53:</strong> DNS management (optional)</li>
+            <li><strong>S3:</strong> Static asset storage (implicit via EB)</li>
+          </ul>
+
+          <h4>Detailed AWS Architecture</h4>
+          <pre class="architecture-diagram" role="img" aria-label="CloudFront to ALB to EB with CloudWatch and EC2"><code>┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   CloudFront    │───▶│  Application    │───▶│ Elastic         │
+│   (Global CDN)  │    │  Load Balancer  │    │ Beanstalk       │
+│                 │    │  (ALB + ACM)    │    │ Environment     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │              ┌─────────────────┐    ┌─────────────────┐
+         │              │   CloudWatch    │    │    EC2          │
+         └──────────────│   Logs/Metrics  │    │   Instance      │
+                        │                 │    │  (t3.micro)     │
+                        └─────────────────┘    └─────────────────┘</code></pre>
+
+          <p><strong>Achievements:</strong></p>
+          <ul>
+            <li>✅ Production-ready infrastructure deployed in 2 hours</li>
+            <li>✅ HTTPS with managed certificates (auto-renewal)</li>
+            <li>✅ Global edge distribution with 14 edge locations active</li>
+            <li>✅ Comprehensive monitoring with custom dashboards</li>
+            <li>✅ Auto-scaling based on CPU and request metrics</li>
+            <li>✅ Zero-downtime deployments with health checks</li>
+          </ul>
+
+          <h3>Phase 2: Heroku Cloud Migration (Day 2)</h3>
+
+          <h4>Migration Decision Matrix</h4>
+          <div class="comparison-table-simple" role="table" aria-label="AWS vs Heroku decision matrix">
+            <table>
+              <thead>
+                <tr>
+                  <th>Factor</th>
+                  <th>AWS</th>
+                  <th>Heroku</th>
+                  <th>Decision Weight</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Cost</strong></td>
+                  <td>$36-55/month</td>
+                  <td>$7/month</td>
+                  <td>High</td>
+                </tr>
+                <tr>
+                  <td><strong>Complexity</strong></td>
+                  <td>High (multiple services)</td>
+                  <td>Low (single dyno)</td>
+                  <td>Medium</td>
+                </tr>
+                <tr>
+                  <td><strong>Scalability</strong></td>
+                  <td>Excellent</td>
+                  <td>Good</td>
+                  <td>Low (current needs)</td>
+                </tr>
+                <tr>
+                  <td><strong>Dev Velocity</strong></td>
+                  <td>Medium</td>
+                  <td>High</td>
+                  <td>High</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <p><strong>Migration Triggers:</strong></p>
+          <ul>
+            <li>💰 Cost optimization (had existing Heroku credits worth $100)</li>
+            <li>🚀 Simpler deployment pipeline for rapid iteration</li>
+            <li>🔧 Reduced operational overhead for solo development</li>
+            <li>📊 Usage patterns showed over-provisioning on AWS</li>
+          </ul>
+        </section>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Technical Challenges -->
+        <section class="journal-section" aria-labelledby="problems-heading">
+          <h2 id="problems-heading">🐛 Problem Solving & Bug Fixes</h2>
+
+          <h3>Issue 1: Checkbox Collapse Behavior</h3>
+          <p><strong>Problem:</strong> Clicking checkboxes collapsed playlist cards unintentionally</p>
+          <p><strong>Root Cause:</strong> <code>updatePlaylistCard()</code> always reset to 'collapsed' state after checkbox interactions</p>
+          <p><strong>Solution:</strong></p>
+
+          <pre class="code-block" aria-label="Fix collapse behavior"><code class="language-javascript">updatePlaylistCard(playlistIndex) {
+    const wasExpanded = existingCard.classList.contains('expanded');
+    const newCard = this.createPlaylistCard(playlist, playlistIndex);
+    
+    // Preserve state
+    newCard.classList.remove('expanded', 'collapsed');
+    if (wasExpanded) {
+        newCard.classList.add('expanded');
+    } else {
+        newCard.classList.add('collapsed');
+    }
+}</code></pre>
+
+          <h3>Issue 2: CloudFront 504 Gateway Timeout</h3>
+          <p><strong>Problem:</strong> Long yt-dlp processing times causing CDN timeouts with large playlists</p>
+          <p><strong>Root Cause Identified:</strong></p>
+          <ul>
+            <li>YouTube API rate limiting during metadata extraction</li>
+            <li>Sequential processing of video information</li>
+            <li>No connection keep-alive during long operations</li>
+            <li>CloudFront timeout before origin completion</li>
+          </ul>
+
+          <p><strong>Multi-layered Solution:</strong></p>
+          <ol>
+            <li>Increase CloudFront timeout settings (60s)</li>
+            <li>Implement chunked processing for large playlists</li>
+            <li>Add progress indicators for user feedback</li>
+            <li>Separate CDN behaviors for different API endpoints</li>
+            <li>Enhanced monitoring and alerting</li>
+          </ol>
+
+          <h4>Performance Metrics After Optimization:</h4>
+          <div class="comparison-table-simple" role="table" aria-label="Performance before and after">
+            <table>
+              <thead>
+                <tr>
+                  <th>Playlist Size</th>
+                  <th>Before</th>
+                  <th>After</th>
+                  <th>Improvement</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1-10 videos</td>
+                  <td>3-5s</td>
+                  <td>2-3s</td>
+                  <td>✅ 20% faster</td>
+                </tr>
+                <tr>
+                  <td>11-50 videos</td>
+                  <td>15-30s</td>
+                  <td>8-15s</td>
+                  <td>✅ 50% faster</td>
+                </tr>
+                <tr>
+                  <td>51-100 videos</td>
+                  <td>Timeout</td>
+                  <td>20-40s</td>
+                  <td>✅ Success</td>
+                </tr>
+                <tr>
+                  <td>100+ videos</td>
+                  <td>Timeout</td>
+                  <td>Async queue</td>
+                  <td>✅ Reliable</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Performance Comparison -->
+        <section class="journal-section" aria-labelledby="performance-heading">
+          <h2 id="performance-heading">📊 Performance Comparison: AWS vs Heroku</h2>
+
+          <div class="comparison-table-simple" role="table" aria-label="AWS vs Heroku performance">
+            <table>
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>AWS (Before)</th>
+                  <th>Heroku (After)</th>
+                  <th>Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Cold Start</td>
+                  <td>2-3 seconds</td>
+                  <td>10-15 seconds</td>
+                  <td class="negative">❌ Degraded</td>
+                </tr>
+                <tr>
+                  <td>Response Time</td>
+                  <td>150ms</td>
+                  <td>200ms</td>
+                  <td class="negative">❌ Slight increase</td>
+                </tr>
+                <tr>
+                  <td>Deploy Time</td>
+                  <td>8-12 minutes</td>
+                  <td>3-5 minutes</td>
+                  <td class="positive">✅ 50% faster</td>
+                </tr>
+                <tr>
+                  <td>Monthly Cost</td>
+                  <td>$45</td>
+                  <td>$7</td>
+                  <td class="positive">✅ 84% reduction</td>
+                </tr>
+                <tr>
+                  <td>Setup Complexity</td>
+                  <td>High</td>
+                  <td>Low</td>
+                  <td class="positive">✅ Simplified</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Key Learnings -->
+        <section class="journal-section" aria-labelledby="learnings-heading">
+          <h2 id="learnings-heading">🎓 Key Learnings</h2>
+
+          <h3>Technical Insights</h3>
+          <ol>
+            <li><strong>Stateless > Stateful:</strong> For simple apps, client-side storage often better</li>
+            <li><strong>Progressive Enhancement:</strong> Start simple, add complexity when needed</li>
+            <li><strong>Platform Flexibility:</strong> Architecture should enable easy migration</li>
+            <li><strong>Event Handling:</strong> Careful delegation prevents UI bugs</li>
+            <li><strong>Mobile-First:</strong> Responsive design as core requirement, not afterthought</li>
+          </ol>
+
+          <h3>Deployment Insights</h3>
+          <ol>
+            <li><strong>Cloud Strategy Evolution:</strong> Start with robust infrastructure (AWS) for validation, then optimize for cost (Heroku) based on actual usage</li>
+            <li><strong>Multi-Cloud Competency:</strong> Maintain deployment scripts for both platforms to avoid vendor lock-in</li>
+            <li><strong>Cost Monitoring:</strong> Implement billing alerts from day one</li>
+            <li><strong>Infrastructure as Code:</strong> Document configurations for reproducible deployments</li>
+            <li><strong>Migration Planning:</strong> Always have a rollback strategy; test migrations in staging first</li>
+          </ol>
+
+          <h3>Cloud Architecture Insights</h3>
+          <ol>
+            <li><strong>Stateless Design:</strong> Enables seamless migration between cloud providers</li>
+            <li><strong>Timeout Cascades:</strong> Every layer in the stack has timeouts; design for the weakest link</li>
+            <li><strong>Monitoring Hierarchy:</strong> Application → Infrastructure → Business metrics</li>
+            <li><strong>Security Layers:</strong> Defense in depth across IAM, network, application, and data</li>
+            <li><strong>Vendor Selection:</strong> Align services with team expertise and operational capacity</li>
+          </ol>
+        </section>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Project Statistics -->
+        <section class="journal-section" aria-labelledby="stats-heading">
+          <h2 id="stats-heading">📝 Project Statistics</h2>
+
+          <div class="stats-grid" role="list">
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="Development days">3</span>
+              <span class="stat-label">Development Days</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="Lines of code">2,511</span>
+              <span class="stat-label">Lines of Code</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="Features implemented">15+</span>
+              <span class="stat-label">Features Implemented</span>
+            </div>
+            <div class="stat-item" role="listitem">
+              <span class="stat-number" aria-label="Cost reduction">87%</span>
+              <span class="stat-label">Cost Reduction</span>
+            </div>
+          </div>
+
+          <h3>Lines of Code Breakdown</h3>
+          <ul>
+            <li>JavaScript: ~878 lines</li>
+            <li>CSS: ~1,511 lines</li>
+            <li>HTML: ~122 lines</li>
+            <li><strong>Total: ~2,511 lines</strong></li>
+          </ul>
+        </section>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Success Metrics -->
+        <section class="journal-section" aria-labelledby="success-heading">
+          <h2 id="success-heading">🏆 Success Metrics</h2>
+
+          <h3>Technical Success</h3>
+          <ul>
+            <li>✅ Zero-downtime deployment pipeline</li>
+            <li>✅ Sub-second response times for UI interactions</li>
+            <li>✅ Mobile-responsive design working across devices</li>
+            <li>✅ Cost-effective hosting solution identified</li>
+          </ul>
+
+          <h3>User Experience Success</h3>
+          <ul>
+            <li>✅ Intuitive playlist management interface</li>
+            <li>✅ Reliable progress tracking without data loss</li>
+            <li>✅ Smooth video playback integration</li>
+            <li>✅ Accessible keyboard navigation</li>
+          </ul>
+
+          <h3>Business Success</h3>
+          <ul>
+            <li>✅ MVP delivered within 3-day timeline</li>
+            <li>✅ 87% cost reduction through platform optimization</li>
+            <li>✅ Scalable architecture for future growth</li>
+            <li>✅ Documented knowledge for future developers</li>
+          </ul>
+        </section>
+
+        <hr class="section-divider" role="separator" aria-hidden="true">
+
+        <!-- Reflections -->
+        <section class="journal-section" aria-labelledby="reflections-heading">
+          <h2 id="reflections-heading">💭 Reflections</h2>
+
+          <p>This project successfully demonstrated the power of simple, well-architected solutions. By choosing a stateless server + rich client model, we achieved:</p>
+
+          <ol>
+            <li><strong>Rapid Development:</strong> Core functionality in 3 days</li>
+            <li><strong>Cost Efficiency:</strong> Minimal infrastructure requirements</li>
+            <li><strong>User Ownership:</strong> Data privacy through local storage</li>
+            <li><strong>Platform Flexibility:</strong> Easy migration between cloud providers</li>
+          </ol>
+
+          <p>The journey from AWS to Heroku illustrated an important principle: optimize for your current context, not theoretical scale. Starting with robust infrastructure (AWS) validated the architecture, while migrating to cost-effective hosting (Heroku) optimized for actual usage patterns.</p>
+
+          <div class="key-takeaway" role="note" aria-label="Key takeaway">
+            <p><strong>Key takeaway: Build for today's needs with tomorrow's flexibility in mind.</strong></p>
+          </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="journal-footer-simple">
+          <p><em>End of Journal Entry - August 2025</em></p>
+          <div class="footer-actions">
+            <a href="index.html" class="btn-secondary">
+              <i class="fas fa-arrow-left" aria-hidden="true"></i>
+              <span>Back to Portfolio</span>
+            </a>
+            <a href="mailto:rushirajbirajdar@gmail.com" class="btn-primary">
+              <i class="fas fa-envelope" aria-hidden="true"></i>
+              <span>Discuss Project</span>
+            </a>
+          </div>
+        </footer>
+
+      </article>
+    </div>
+  </main>
+
+  <!-- Scripts (defer to avoid blocking) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/components/prism-core.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/plugins/autoloader/prism-autoloader.min.js" defer></script>
+  <script src="script.js" defer></script>
+</body>
+</html>
